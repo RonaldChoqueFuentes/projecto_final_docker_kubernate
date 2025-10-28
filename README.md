@@ -1,263 +1,163 @@
-# Proyecto Integrador - Docker & Kubernetes
-
-Aplicación full-stack progresiva que evoluciona clase a clase, desde una API REST simple hasta un sistema completo desplegado en Kubernetes con microservicios, base de datos, cache, frontend, Ingress y HPA.
-
-**Autor:** Alejandro Fiengo ([alefiengo.dev](https://alefiengo.dev))
-**Curso:** Docker & Kubernetes - Contenedores y Orquestación en la Práctica
-**Institución:** i-Quattro
-
----
-
-## Inicio Rápido
-
-Elige tu plataforma de despliegue:
-
-### Docker Compose (Clases 2-5)
-```bash
-cd docker-compose/
-docker compose up -d --build
-```
-**[Guía completa Docker Compose](docker-compose/README.md)**
-
-### Kubernetes (Clases 6-8)
-```bash
-cd k8s/
-# Seguir guía de despliegue según tu cluster
-```
-**[Guía de Despliegue Kubernetes (minikube)](k8s/DEPLOYMENT_GUIDE.md)**
-**[Guía de Despliegue Kubernetes (microk8s)](k8s/DEPLOYMENT_GUIDE_MICROK8S.md)**
-
----
-
-## Evolución del Proyecto
-
-| Versión | Tag | Stack | Qué se agrega |
-|---------|-----|-------|---------------|
-| **v1.0** | `v1.0-clase2` | Spring Boot | REST API in-memory con Dockerfile multi-stage |
-| **v1.1** | `v1.1-clase3` | + PostgreSQL | Persistencia con Spring Data JPA + Docker Compose |
-| **v1.2** | `v1.2-clase4` | + Redis + Angular + Kong | Cache, frontend SPA, API Gateway |
-| **v1.3** | `v1.3-clase5` | + Seguridad | Trivy scan, optimizaciones, non-root users |
-| **v2.0** | `v2.0-clases6-7-8` | **Migración completa a Kubernetes** | Deployments, Services, ConfigMaps, Secrets, StatefulSet, Ingress, HPA |
-
----
-
-## Arquitectura
-
-### Docker Compose (v1.2 - v1.3)
-
-```
-Cliente → Angular :4200 → Kong :8000 → Spring Boot :8080
-                                              |
-                                              +-- Redis :6379
-                                              +-- PostgreSQL :5432
-```
-
-**[Ver arquitectura detallada Docker Compose](ARCHITECTURE.md#arquitectura-docker-compose-v12)**
-
-### Kubernetes (v2.0)
-
-```
-Cliente → Ingress :80 → Frontend Pods (nginx BFF)
-                   |         |
-                   |         +-- /api/* → API Pods (2-5 HPA)
-                   |                           |
-                   +-- /api/* → API Service    +-- Redis
-                                               +-- PostgreSQL (StatefulSet + PVC)
-```
-
-**[Ver arquitectura detallada Kubernetes](ARCHITECTURE.md#arquitectura-kubernetes-v20)**
-
----
-
-## Stack Tecnológico
-
-### Backend
-- **Spring Boot** 3.5.6 (Java 17)
-- **PostgreSQL** 15 (base de datos)
-- **Redis** 7 (cache)
-- **Spring Data JPA** (ORM)
-- **Spring Cache** (abstraction)
-- **Spring Actuator** (metrics/health)
-
-### Frontend
-- **Angular** 17+
-- **nginx** (servidor + BFF proxy)
-
-### Infraestructura
-
-#### Docker Compose
-- **Kong** 3.4 (API Gateway)
-- **Docker Compose** (orquestación)
-- Multi-stage builds
-- Non-root users
-
-#### Kubernetes
-- **Deployments** + **Services**
-- **StatefulSet** (PostgreSQL con persistencia)
-- **ConfigMaps** + **Secrets**
-- **NGINX Ingress** (routing HTTP)
-- **HPA** (Horizontal Pod Autoscaler)
-- **Health Probes** (liveness, readiness, startup)
-- **BFF Pattern** (nginx proxy en frontend)
-
----
-
-## Endpoints de la API
-
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| GET | `/` | Página de bienvenida |
-| GET | `/api/greeting` | Mensaje de saludo |
-| GET | `/api/info` | Información de la aplicación |
-| GET | `/api/users` | Listar usuarios (con cache) |
-| GET | `/api/users/{id}` | Obtener usuario por ID |
-| POST | `/api/users` | Crear usuario |
-| PUT | `/api/users/{id}` | Actualizar usuario |
-| DELETE | `/api/users/{id}` | Eliminar usuario |
-| GET | `/actuator/health` | Health check |
-| GET | `/actuator/health/liveness` | Liveness probe (K8s) |
-| GET | `/actuator/health/readiness` | Readiness probe (K8s) |
-
----
-
-## Documentación
-
-### Guías de Despliegue
-- **[Docker Compose](docker-compose/README.md)** - Despliegue con Docker Compose (v1.2-v1.3)
-- **[Kubernetes (minikube)](k8s/DEPLOYMENT_GUIDE.md)** - Guía paso a paso para minikube
-- **[Kubernetes (microk8s)](k8s/DEPLOYMENT_GUIDE_MICROK8S.md)** - Guía paso a paso para microk8s
-
-### Documentación Técnica
-- **[ARCHITECTURE.md](ARCHITECTURE.md)** - Diagramas de arquitectura, flujos de datos y decisiones de diseño
-- **[SECURITY.md](SECURITY.md)** - Buenas prácticas de seguridad y escaneo con Trivy (v1.3)
-
----
-
-## Trabajar con Tags
-
-Este proyecto usa tags de Git para cada versión del curso:
+### Entregables Parte 1
 
 ```bash
-# Clonar el repositorio
-git clone https://github.com/alefiengo/proyecto-integrador-docker-k8s.git
-cd proyecto-integrador-docker-k8s
-
-# Ver todas las versiones disponibles
-git tag
-
-# Checkout a una versión específica
-git checkout v1.0-clase2    # Versión básica (Clase 2)
-git checkout v1.1-clase3    # Con PostgreSQL (Clase 3)
-git checkout v1.2-clase4    # Con Redis, Angular, Kong (Clase 4)
-git checkout v1.3-clase5    # Con seguridad (Clase 5)
-git checkout v2.0-clases6-7-8  # Kubernetes completo (Clases 6-8)
-
-# Comparar cambios entre versiones
-git diff v1.2-clase4 v1.3-clase5
+microk8s status
 ```
 
----
+![alt text](screenshoots/parte_01/image.png)
 
-## Verificación Rápida
-
-### Docker Compose
 ```bash
-# Levantar servicios
-cd docker-compose/
-docker compose up -d
-
-# Verificar que todo funciona
-curl http://localhost:8000/api/users  # Via Kong
-curl http://localhost:4200            # Frontend
-
-# Ver logs
-docker compose logs -f app
-```
-
-### Kubernetes
-```bash
-# Desplegar
-cd k8s/
-kubectl apply -f 00-namespace/
-kubectl apply -f 01-configmaps/
-kubectl apply -f 02-secrets/
-# ... (ver guía completa)
-
-# Verificar
 kubectl get all -n proyecto-integrador
+```
+![alt text](screenshoots/parte_01/image-1.png)
 
-# Port-forward para acceder
-kubectl port-forward -n ingress-nginx svc/ingress-nginx-controller 8080:80
+Localhost browser
 
-# Acceder
-curl http://localhost:8080/api/users
-curl http://localhost:8080/           # Frontend
+![alt text](screenshoots/parte_01/image-2.png)
+
+Virtual Box Configuration
+
+![alt text](screenshoots/parte_01/image-3.png)
+
+## Parte 2: Iteración v2.1 - Modificar Backend
+### Objetivo
+Agregar un nuevo endpoint en el backend, versionar la imagen como v2.1, publicarla en tu Docker Hub y actualizar el deployment.
+### Tareas
+
+#### 2.1 Agregar Nuevo Endpoint
+
+Editar el archivo: `src/main/java/dev/alefiengo/api/controller/GreetingController.java`
+
+Agregar el siguiente método:
+
+```java
+@GetMapping("/api/info")
+public ResponseEntity<Map<String, Object>> getInfo() {
+    Map<String, Object> info = new HashMap<>();
+    info.put("alumno", "RONALD CHOQUE FUENTES");
+    info.put("version", "v2.1");
+    info.put("curso", "Docker & Kubernetes - i-Quattro");
+    info.put("timestamp", LocalDateTime.now().toString());
+    info.put("hostname", System.getenv("HOSTNAME"));
+    return ResponseEntity.ok(info);
+}
 ```
 
----
 
-## Desarrollo
-
-### Requisitos Previos
-
-- **Docker** Desktop o Docker Engine
-- **Docker Compose** v2
-- **Java** 17+
-- **Maven** 3.9+
-- **Node.js** 18+ (para Angular)
-
-### Kubernetes (adicional)
-- **minikube** o **microk8s** o cluster cloud
-- **kubectl**
-- **Helm** 3+ (opcional)
-
-### Construir Imágenes
+#### 2.2 Build Imagen Docker v2.1
 
 ```bash
-# Backend
-docker build -t alefiengo/springboot-api:v2.0 .
+# Build imagen (reemplaza 'tu-usuario' con tu username de Docker Hub)
+docker build -t ronaldchoque/springboot-api:v2.1 .
 
-# Frontend
-docker build -t alefiengo/angular-frontend:v2.0 ./frontend/
-
-# Publicar a Docker Hub (opcional)
-docker login
-docker push alefiengo/springboot-api:v2.0
-docker push alefiengo/angular-frontend:v2.0
+# Verificar imagen
+docker images | grep springboot-api
 ```
 
----
+![alt text](screenshoots/parte_02/image.png)
 
-## 🤝 Contribuir
+#### 2.3 Push a Docker Hub
 
-Este es un proyecto educativo para el curso de Docker & Kubernetes. Si encuentras errores o mejoras:
+```bash
+# Push
+docker ronaldchoque/springboot-api:v2.1
+# Verificar en https://hub.docker.com/r/ronaldchoque/springboot-api/tags
+```
+![alt text](screenshoots/parte_02/image-1.png)
 
-1. Haz fork del proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/mejora`)
-3. Commit tus cambios (`git commit -m 'feat: agregar mejora'`)
-4. Push a la rama (`git push origin feature/mejora`)
-5. Abre un Pull Request
+![alt text]screenshoots/parte_02/image-2.png)
 
----
+#### 2.4 Actualizar Deployment de Kubernetes
 
-## 📝 Licencia
+Editar: `k8s/05-backend/api-deployment.yaml`
 
-Este proyecto es material educativo desarrollado por Alejandro Fiengo para el curso de Docker & Kubernetes en i-Quattro.
+Buscar y cambiar la imagen del contenedor `api`:
+```yaml
+# Antes:
+image: alefiengo/springboot-api:v2.0
 
----
+# Después:
+image: ronaldchoque/springboot-api:v2.1
+```
 
-## 📞 Contacto
+#### 2.5 Aplicar Cambios
 
-- **Autor:** Alejandro Fiengo
-- **Website:** [alefiengo.dev](https://alefiengo.dev)
-- **GitHub:** [@alefiengo](https://github.com/alefiengo)
-- **Curso:** Docker & Kubernetes - i-Quattro
+```bash
+# Aplicar el deployment actualizado
+kubectl apply -f k8s/05-backend/api-deployment.yaml
 
----
 
-## Recursos
+# Ver el estado del rollout
+kubectl rollout status deployment/api -n proyecto-integrador
 
-- [Spring Boot Documentation](https://docs.spring.io/spring-boot/docs/current/reference/html/)
-- [Docker Documentation](https://docs.docker.com/)
-- [Kubernetes Documentation](https://kubernetes.io/docs/)
-- [Angular Documentation](https://angular.io/docs)
+# Ver los pods actualizándose
+kubectl get pods -n proyecto-integrador -w
+```
+
+![alt text](screenshoots/parte_02/image-3.png)
+
+
+#### 2.6 Verificar Funcionamiento
+
+```bash
+# Opción 1: Port-forward
+kubectl port-forward -n proyecto-integrador svc/api-service 8080:8080
+
+# En otra terminal
+curl http://localhost:8080/api/info
+
+# Opción 2: Via Ingress
+curl http://<IP-METALLB>/api/info
+```
+
+**Salida esperada:**
+```json
+{
+  "alumno": "Tu Nombre",
+  "version": "v2.1",
+  "curso": "Docker & Kubernetes - i-Quattro",
+  "timestamp": "2025-01-17T10:30:00",
+  "hostname": "api-xxxx-yyyy"
+}
+```
+
+![alt text](screenshoots/parte_02/image-4.png)
+
+#### 2.7 Crear Tag en Git
+
+```bash
+git add .
+git commit -m "feat: add info endpoint for v2.1"
+git tag -a v2.1 -m "Backend v2.1 con endpoint /api/info"
+
+```
+### Entregables Parte 2
+
+![alt text](screenshoots/parte_02/image-5.png)
+
+```bash
+docker images
+```
+![alt text](screenshoots/parte_02/image-6.png)
+
+
+https://hub.docker.com/r/ronaldchoque/springboot-api/tags
+
+![alt text](screenshoots/parte_02/image-7.png)
+
+GET POTS
+```bash
+kubectl get pods -n proyecto-integrador -w
+```
+![alt text](screenshoots/parte_02/image-8.png)
+
+- Screenshot o output de `curl http://<IP-METALLB>/api/info` mostrando la respuesta JSON
+![alt text](screenshoots/parte_02/image-9.png)
+
+Screenshot de `kubectl rollout status` durante la actualización
+
+```bash
+kubectl rollout status deployment/api -n proyecto-integrador
+```
+![alt text](screenshoots/parte_02/mage-10.png)
+
