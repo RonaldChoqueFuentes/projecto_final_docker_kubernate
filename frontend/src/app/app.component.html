@@ -31,6 +31,7 @@
             Kubernetes v2.0 (Ingress, HPA, StatefulSets)
           </a>
         </li>
+
       </ul>
     </div>
   </div>
@@ -80,6 +81,20 @@
         </button>
       </div>
     </form>
+  </div>
+  <div class="form-group">
+    <button (click)="getSystemInfo()" class="btn-primary">
+      Ver Info del Sistema
+    </button>
+  </div>
+
+  <div *ngIf="systemInfo" class="card info-section">
+    <h3>Información del Sistema</h3>
+    <p><strong>Alumno:</strong> {{ systemInfo.alumno }}</p>
+    <p><strong>Versión:</strong> {{ systemInfo.version }}</p>
+    <p><strong>Curso:</strong> {{ systemInfo.curso }}</p>
+    <p><strong>Timestamp:</strong> {{ systemInfo.timestamp }}</p>
+    <p><strong>Pod:</strong> {{ systemInfo.hostname }}</p>
   </div>
 
   <!-- Lista de usuarios -->

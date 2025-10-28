@@ -22,6 +22,7 @@ export class AppComponent implements OnInit {
   loading = false;
   error: string | null = null;
   success: string | null = null;
+  systemInfo: any = null;
 
   // Detección de versión basada en puerto
   version = 'v2.0';
@@ -128,5 +129,19 @@ export class AppComponent implements OnInit {
   clearMessages(): void {
     this.error = null;
     this.success = null;
+  }
+
+  getSystemInfo(): void {
+    this.http.get('/api/info').subscribe({
+      next: (data) => {
+        this.systemInfo = data;
+        this.success = 'Información del sistema cargada';
+        setTimeout(() => this.success = null, 3000);
+      },
+      error: (err) => {
+        this.error = 'Error al obtener información del sistema';
+        console.error('Error:', err);
+      }
+    });
   }
 }
