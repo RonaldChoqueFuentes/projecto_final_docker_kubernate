@@ -159,5 +159,5 @@ Screenshot de `kubectl rollout status` durante la actualización
 ```bash
 kubectl rollout status deployment/api -n proyecto-integrador
 ```
-![alt text](screenshoots/parte_02/mage-10.png)
+![rollout status](screenshoots/parte_02/image-10.png)
 
