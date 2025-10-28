@@ -168,113 +168,20 @@ kubectl rollout status deployment/api -n proyecto-integrador
 ### Objetivo
 Agregar funcionalidad en el frontend para consumir el nuevo endpoint `/api/info`, versionar como v2.2 y desplegar.
 
-### Tareas
-
-#### 3.1 Modificar Frontend Angular
-
-Editar: `frontend/src/app/app.component.html`
-
-Agregar después del botón "Registrar Usuario" (alrededor de la línea 30):
-
-```html
-<div class="form-group">
-  <button (click)="getSystemInfo()" class="btn-primary">
-    Ver Info del Sistema
-  </button>
-</div>
-
-<div *ngIf="systemInfo" class="card info-section">
-  <h3>Información del Sistema</h3>
-  <p><strong>Alumno:</strong> {{ systemInfo.alumno }}</p>
-  <p><strong>Versión:</strong> {{ systemInfo.version }}</p>
-  <p><strong>Curso:</strong> {{ systemInfo.curso }}</p>
-  <p><strong>Timestamp:</strong> {{ systemInfo.timestamp }}</p>
-  <p><strong>Pod:</strong> {{ systemInfo.hostname }}</p>
-</div>
-```
-
-Editar: `frontend/src/app/app.component.ts`
-
-Agregar la propiedad y método:
-
-```typescript
-export class AppComponent implements OnInit {
-  // ... propiedades existentes ...
-  systemInfo: any = null;
-
-  // ... métodos existentes ...
-
-  getSystemInfo(): void {
-    this.http.get('/api/info').subscribe({
-      next: (data) => {
-        this.systemInfo = data;
-        this.success = 'Información del sistema cargada';
-        setTimeout(() => this.success = null, 3000);
-      },
-      error: (err) => {
-        this.error = 'Error al obtener información del sistema';
-        console.error('Error:', err);
-      }
-    });
-  }
-}
-```
-
-#### 3.2 Build Imagen Frontend v2.2
-
-```bash
-cd frontend
-
-# Build imagen
-docker build -t tu-usuario/angular-frontend:v2.2 .
-
-# Push
-docker push tu-usuario/angular-frontend:v2.2
-```
-
-#### 3.3 Actualizar Deployment
-
-Editar: `k8s/06-frontend/frontend-deployment.yaml`
-
-Buscar y cambiar la imagen del contenedor `frontend`:
-```yaml
-# Antes:
-image: alefiengo/angular-frontend:v2.0
-
-# Después:
-image: tu-usuario/angular-frontend:v2.2
-```
-
-#### 3.4 Aplicar Cambios
-
-```bash
-# Aplicar el deployment actualizado
-kubectl apply -f k8s/06-frontend/frontend-deployment.yaml
-
-# Ver el estado del rollout
-kubectl rollout status deployment/frontend -n proyecto-integrador
-
-# Ver rolling update en acción
-kubectl get pods -n proyecto-integrador -l app=frontend -w
-```
-
-**Observación:** Al igual que con el backend, Kubernetes detecta el cambio de tag (v2.0 → v2.2) y actualiza automáticamente.
-
-#### 3.5 Verificar Funcionamiento
-
-Acceder desde el navegador a: `http://<IP-METALLB>/`
-
-- Hacer clic en "Ver Info del Sistema"
-- Verificar que se muestre la información correctamente
-- Refrescar varias veces y observar que el `hostname` puede cambiar (load balancing entre pods)
-
-**ACCIÓN REQUERIDA:** Una vez que hayas verificado que el frontend v2.2 muestra correctamente la información del sistema, captura los screenshots solicitados en los Entregables Parte 3.
 
 ### Entregables Parte 3
 - Código modificado de Angular (screenshots de .html y .ts)
-- Link a tu imagen en Docker Hub: `https://hub.docker.com/r/tu-usuario/angular-frontend/tags`
-- Screenshot de `kubectl get pods -w` durante el rolling update del frontend
-- Screenshot del navegador mostrando el botón "Ver Info del Sistema"
-- Screenshot del navegador mostrando la información del sistema cargada
+![alt text](screenshoots/parte_03/image.png)
+![alt text](screenshoots/parte_03/image-1.png)
 
+- Link a tu imagen en Docker Hub: `https://hub.docker.com/r/ronaldchoque/angular-frontend/tags`
+
+![alt text](screenshoots/parte_03/image-2.png)
+
+- Screenshot de `kubectl get pods -n proyecto-integrador -l app=frontend` durante el rolling update del frontend
+![alt text](screenshoots/parte_03/image-3.png)
+- Screenshot del navegador mostrando el botón "Ver Info del Sistema"
+![alt text](screenshoots/parte_03/image-4.png)
+- Screenshot del navegador mostrando la información del sistema cargada
+![alt text](screenshoots/parte_03/image-5.png)
 ---
