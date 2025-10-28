@@ -185,3 +185,79 @@ Agregar funcionalidad en el frontend para consumir el nuevo endpoint `/api/info`
 - Screenshot del navegador mostrando la información del sistema cargada
 ![alt text](screenshoots/parte_03/image-5.png)
 ---
+---
+
+## Parte 4: Gestión de Versiones con Rollout (20%)
+
+### Objetivo
+Aprender a gestionar versiones de deployments usando comandos de rollout (rollback, rollforward, historial).
+
+### Tareas
+
+#### 4.1 Ver Historial de Rollouts
+
+```bash
+# Ver historial del backend
+kubectl rollout history deployment/api -n proyecto-integrador
+
+# Ver historial del frontend
+kubectl rollout history deployment/frontend -n proyecto-integrador
+```
+
+**Salida esperada:**
+```
+REVISION  CHANGE-CAUSE
+1         <none>
+2         <none>
+```
+
+#### 4.2 Hacer Rollback a Versión Anterior
+
+```bash
+# Rollback del backend a v2.0
+kubectl rollout undo deployment/api -n proyecto-integrador
+
+# Ver el proceso
+kubectl rollout status deployment/api -n proyecto-integrador
+
+# Verificar que el endpoint /api/info ya NO existe
+curl http://<IP-METALLB>/api/info
+# Debería dar error 404
+```
+
+#### 4.3 Volver a la Versión v2.1 (Rollforward)
+
+```bash
+# Ver historial actualizado
+kubectl rollout history deployment/api -n proyecto-integrador
+
+# Rollback a la revisión 2 (que es v2.1)
+kubectl rollout undo deployment/api --to-revision=2 -n proyecto-integrador
+
+# Verificar
+curl http://<IP-METALLB>/api/info
+# Debería funcionar nuevamente
+```
+
+#### 4.4 Forzar Recreación de Pods
+
+```bash
+# Reiniciar deployment sin cambiar imagen (útil para debugging)
+kubectl rollout restart deployment/api -n proyecto-integrador
+
+# Ver los pods recreándose
+kubectl get pods -n proyecto-integrador -w
+```
+
+**ACCIÓN REQUERIDA:** Captura los screenshots de todos los pasos de rollout (history, rollback, rollforward) solicitados en los Entregables Parte 4.
+
+### Entregables Parte 4
+- Screenshot de `kubectl rollout history` del backend
+- Screenshot de `kubectl rollout history` del frontend
+- Screenshot del proceso de rollback (undo)
+- Screenshot verificando que `/api/info` dejó de funcionar después del rollback
+- Screenshot del rollforward (undo --to-revision=2)
+- Screenshot verificando que `/api/info` volvió a funcionar
+- Explicación en tus propias palabras: ¿Qué hace `kubectl rollout undo`?
+
+---
