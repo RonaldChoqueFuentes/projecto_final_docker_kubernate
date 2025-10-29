@@ -1,3 +1,14 @@
+ # Proyecto Final - Docker & Kubernetes
+
+   - Alumno: Ronald Choque Fuentes
+   - Fecha: 28-10-2025
+   - Curso: Docker & Kubernetes - i-Quattro
+
+   ## Links de Docker Hub
+   - Backend v2.1: https://hub.docker.com/r/ronaldchoque/springboot-api/tags
+   - Frontend v2.2: https://hub.docker.com/r/ronaldchoque/angular-frontend/tags
+
+
 ### Entregables Parte 1
 
 ```bash
@@ -231,5 +242,75 @@ este obtine el old response de /api/info
 
 - Explicación en tus propias palabras: ¿Qué hace `kubectl rollout undo`?
 -- Regresa a un deployment anterior al actual.
+
+---
+
+## Parte 5: Acceso Externo via Ingress + MetalLB (15%)
+
+### Objetivo
+Verificar que el acceso externo funciona correctamente sin necesidad de port-forward, simulando un entorno cloud real.
+
+### Tareas
+
+#### 5.1 Verificar Configuración de Ingress
+
+```bash
+# Ver configuración del Ingress
+kubectl get ingress -n proyecto-integrador
+
+# Ver detalles
+kubectl describe ingress app-ingress -n proyecto-integrador
+```
+
+**Salida esperada:**
+```
+NAME          CLASS   HOSTS   ADDRESS       PORTS   AGE
+app-ingress   nginx   *       10.0.0.100    80      2d
+```
+
+#### 5.2 Verificar MetalLB
+
+```bash
+# Ver servicios de MetalLB
+kubectl get svc -n ingress
+
+# Ver configuración de MetalLB
+kubectl get ipaddresspool -n metallb-system
+```
+
+#### 5.3 Probar TODOS los Endpoints via IP Externa
+
+Desde el navegador o curl, probar:
+
+```bash
+# Frontend
+curl http://<IP-METALLB>/
+
+# API Users
+curl http://<IP-METALLB>/api/users
+
+# API Greeting
+curl http://<IP-METALLB>/api/greeting
+
+# API Info (nuevo)
+curl http://<IP-METALLB>/api/info
+
+# Actuator Health
+curl http://<IP-METALLB>/actuator/health
+```
+
+#### 5.4 Probar desde Otra Máquina en la Red (Opcional)
+
+Si tienes otra computadora en la misma red, intenta acceder a `http://<IP-METALLB>/` para verificar que el acceso externo funciona.
+
+**ACCIÓN REQUERIDA:** Una vez que hayas verificado que todos los endpoints son accesibles vía Ingress con MetalLB, captura los screenshots solicitados en los Entregables Parte 5.
+
+### Entregables Parte 5
+- Screenshot de `kubectl get ingress` mostrando la IP asignada
+- Screenshot de `kubectl describe ingress` mostrando las rutas configuradas
+- Screenshot del navegador accediendo a `http://<IP-METALLB>/` (frontend)
+- Screenshot de curl a `/api/info` desde la IP de MetalLB
+- Screenshot de curl a `/actuator/health` mostrando status UP
+- IP del Ingress (anotar)
 
 ---
