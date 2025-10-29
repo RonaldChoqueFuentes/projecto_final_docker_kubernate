@@ -250,67 +250,29 @@ este obtine el old response de /api/info
 ### Objetivo
 Verificar que el acceso externo funciona correctamente sin necesidad de port-forward, simulando un entorno cloud real.
 
-### Tareas
-
-#### 5.1 Verificar Configuración de Ingress
-
-```bash
-# Ver configuración del Ingress
-kubectl get ingress -n proyecto-integrador
-
-# Ver detalles
-kubectl describe ingress app-ingress -n proyecto-integrador
-```
-
-**Salida esperada:**
-```
-NAME          CLASS   HOSTS   ADDRESS       PORTS   AGE
-app-ingress   nginx   *       10.0.0.100    80      2d
-```
-
-#### 5.2 Verificar MetalLB
-
-```bash
-# Ver servicios de MetalLB
-kubectl get svc -n ingress
-
-# Ver configuración de MetalLB
-kubectl get ipaddresspool -n metallb-system
-```
-
-#### 5.3 Probar TODOS los Endpoints via IP Externa
-
-Desde el navegador o curl, probar:
-
-```bash
-# Frontend
-curl http://<IP-METALLB>/
-
-# API Users
-curl http://<IP-METALLB>/api/users
-
-# API Greeting
-curl http://<IP-METALLB>/api/greeting
-
-# API Info (nuevo)
-curl http://<IP-METALLB>/api/info
-
-# Actuator Health
-curl http://<IP-METALLB>/actuator/health
-```
-
-#### 5.4 Probar desde Otra Máquina en la Red (Opcional)
-
-Si tienes otra computadora en la misma red, intenta acceder a `http://<IP-METALLB>/` para verificar que el acceso externo funciona.
-
-**ACCIÓN REQUERIDA:** Una vez que hayas verificado que todos los endpoints son accesibles vía Ingress con MetalLB, captura los screenshots solicitados en los Entregables Parte 5.
 
 ### Entregables Parte 5
 - Screenshot de `kubectl get ingress` mostrando la IP asignada
+![alt text](screenshoots/parte_05/image.png)
+
 - Screenshot de `kubectl describe ingress` mostrando las rutas configuradas
+![alt text](screenshoots/parte_05/image-1.png)
+
+![alt text](image-2.png)
+
 - Screenshot del navegador accediendo a `http://<IP-METALLB>/` (frontend)
+![alt text](screenshoots/parte_05/image-4.png)
+
+![alt text](screenshoots/parte_05/image-5.png)
+
 - Screenshot de curl a `/api/info` desde la IP de MetalLB
+
+![alt text](screenshoots/parte_05/image-3.png)
+
 - Screenshot de curl a `/actuator/health` mostrando status UP
+![alt text](screenshoots/parte_05/image-6.png)
+
 - IP del Ingress (anotar)
+-  127.0.0.1
 
 ---
